@@ -118,8 +118,7 @@ namespace Saper_www
                 else
                 {
                     OpenCells(x, y);
-
-                    if (safeCells == 0)
+                    if (CheckWin()) 
                     {
                         GameOver(true);
                     }
@@ -131,6 +130,10 @@ namespace Saper_www
                 {
                     flag[x, y] = !flag[x, y];
                     button.Text = flag[x, y] ? "|>" : "";
+                    if (CheckWin()) 
+                    {
+                        GameOver(true);
+                    }
                 }
             }
         }
@@ -145,14 +148,14 @@ namespace Saper_www
             open[x, y] = true;
             safeCells--;
             buttons[x, y].Enabled = false;
-            buttons[x, y].BackColor = SystemColors.ControlLight;
+            buttons[x, y].BackColor = SystemColors.ControlDarkDark;
 
             int Around = minesAround(x, y);
 
             if (Around > 0)
             {
                 buttons[x, y].Text = Around.ToString();
-                buttons[x, y].ForeColor = GetNumberColor(Around);
+                buttons[x, y].BackColor = GetNumberColor(Around);
             }
             else
             {
@@ -165,7 +168,6 @@ namespace Saper_www
                     }
                 }
             }
-            UpdateStatus($"Осталось безопасных клеток: {safeCells}");
             return;
         }
 
@@ -192,9 +194,9 @@ namespace Saper_www
         {
             switch (number)
             {
-                case 1: return Color.Green;
-                case 2: return Color.Blue;
-                case 3: return Color.Red;
+                case 1: return Color.LightGreen;
+                case 2: return Color.SkyBlue;
+                case 3: return Color.OrangeRed;
                 case 4: return Color.Magenta;
                 case 5: return Color.Yellow;
                 case 6: return Color.Orange;
@@ -204,11 +206,29 @@ namespace Saper_www
             }
         }
 
+        private bool CheckWin()
+        {
+            for (int i = 0; i < col; i++)
+            {
+                for (int j = 0; j < row; j++)
+                {
+                    if (mine[i, j] && !flag[i, j])
+                        return false;
+
+                    if (flag[i, j] && !mine[i, j])
+                        return false;
+
+                    if (!mine[i, j] && !open[i, j])
+                        return false;
+                }
+            }
+            return true;
+        }
+
         private void GameOver(bool isWin)
         {
             gameOver = true;
 
-            // Показываем все мины
             for (int x = 0; x < col; x++)
             {
                 for (int y = 0; y < row; y++)
@@ -220,7 +240,7 @@ namespace Saper_www
                     }
                 }
             }
-
+            
             string message = isWin ? "Поздравляем! Вы победили!" : "Игра окончена! Вы проиграли!";
 
             UpdateStatus(message);
@@ -303,9 +323,9 @@ namespace Saper_www
                     mineCount = 45;
                     break;
                 case Slojnost.hard:
-                    row = 32;
-                    col = 32;
-                    mineCount = 99;
+                    row = 24;
+                    col = 24;
+                    mineCount = 70;
                     break;
 
             }
